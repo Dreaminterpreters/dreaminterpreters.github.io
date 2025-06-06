@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dream Interpreter AI</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#6a11cb" />
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>DreamScape AI</h1>
+            <p class="subtitle">Understand your dreams across multiple traditions</p>
+        </header>
+
+        <!-- Input Section -->
+        <div class="dream-input">
+            <textarea 
+                id="dream-text"
+                placeholder="Describe your dream in detail...&#10;Example: 'I was climbing a steep mountain when I encountered a friendly dog near a waterfall'"
+            >I was climbing a mountain and encountered a dog near water</textarea>
+            <button id="interpret-btn" class="interpret-btn">
+                <div class="loader" id="loader"></div>
+                <span id="btn-text"><i class="fas fa-crystal-ball"></i> Interpret Dream</span>
+            </button>
+            <div class="error-message" id="error-message"></div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="results-section">
+            <div class="section-title">
+                <i class="fas fa-stars"></i>
+                <span>Dream Analysis</span>
+            </div>
+            <div id="interpretations-container">
+                <div class="no-results">
+                    Enter your dream above and click "Interpret Dream"
+                </div>
+            </div>
+
+            <!-- Minimal Sponsored Content -->
+            <div class="ad-section">
+                <div class="ad-label">SPONSORED</div>
+                <div class="ad-title">Dream Dictionary Pro</div>
+                <div class="ad-text">Unlock deeper insights with our premium dream encyclopedia</div>
+                <a href="#" class="ad-link">Get Premium Access</a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="watermark">
+            Powered by Qwen AI • DreamScape v1.0
+        </footer>
+
+        <!-- Font Awesome -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script> 
+    </div>
+</body>
+</html>
