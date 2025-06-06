@@ -1,128 +1,54 @@
-// DOM Elements
-const dreamInput = document.getElementById('dream-text');
-const interpretBtn = document.getElementById('interpret-btn');
-const loader = document.getElementById('loader');
-const btnText = document.getElementById('btn-text');
-const resultsSection = document.getElementById('results-section');
-const interpretationsContainer = document.getElementById('interpretations-container');
-const errorMessage = document.getElementById('error-message');
+// ... your DOM setup code ...
 
-// Display interpretations in the DOM
-function displayInterpretations(data) {
-  interpretationsContainer.innerHTML = '';
-
-  if (!data || data.length === 0) {
-    interpretationsContainer.innerHTML = `
-      <div class="no-results fade-in">
-        No interpretations found for your dream symbols.
-      </div>
-    `;
-    resultsSection.style.display = 'block';
-    return;
-  }
-
-  data.forEach((entry, index) => {
-    const section = document.createElement('div');
-    section.className = 'symbol-card fade-in';
-    section.style.animationDelay = `${index * 0.1}s`;
-
-    const title = document.createElement('div');
-    title.className = 'symbol-title';
-    title.textContent = entry.symbol || 'Symbol';
-    section.appendChild(title);
-
-    const sourceDiv = document.createElement('div');
-    sourceDiv.className = 'interpretation-source';
-
-    const icon = document.createElement('div');
-    icon.className = 'source-icon';
-    icon.style.background = entry.color || '#6a11cb';
-    icon.innerHTML = `<i class="fas fa-${entry.icon || 'book'}"></i>`;
-
-    const name = document.createElement('div');
-    name.className = 'source-name';
-    name.textContent = entry.source || 'Source';
-
-    sourceDiv.appendChild(icon);
-    sourceDiv.appendChild(name);
-    section.appendChild(sourceDiv);
-
-    const text = document.createElement('div');
-    text.className = 'interpretation-text';
-    text.textContent = entry.text;
-    section.appendChild(text);
-
-    if (entry.reference) {
-      const reference = document.createElement('div');
-      reference.className = 'source-reference';
-      reference.textContent = entry.reference;
-      section.appendChild(reference);
-    }
-
-    interpretationsContainer.appendChild(section);
-  });
-
-  resultsSection.style.display = 'block';
-}
-
-// Main handler for interpreting dream
 async function handleInterpretDream() {
   const dreamText = dreamInput.value.trim();
 
   if (!dreamText) {
-    errorMessage.textContent = 'Please describe your dream first';
-    errorMessage.style.display = 'block';
+    errorMessage.textContent = "Please describe your dream first";
+    errorMessage.style.display = "block";
     return;
   }
-
   if (dreamText.split(/\s+/).length < 5) {
-    errorMessage.textContent = 'Please describe your dream in more detail (at least 5 words)';
-    errorMessage.style.display = 'block';
+    errorMessage.textContent = "Please describe your dream in more detail (at least 5 words)";
+    errorMessage.style.display = "block";
     return;
   }
 
-  errorMessage.style.display = 'none';
-  loader.style.display = 'block';
-  btnText.textContent = 'Analyzing Dream...';
-  interpretationsContainer.innerHTML = '';
-  resultsSection.style.display = 'none';
+  errorMessage.style.display = "none";
+  loader.style.display = "block";
+  btnText.textContent = "Analyzing Dream...";
+  interpretationsContainer.innerHTML = "";
+  resultsSection.style.display = "none";
 
   try {
-    // --- SEND THE DREAM TO YOUR API HERE ---
-    const response = await fetch('https://api.deepseek.com/v1/dream', {
-      method: 'POST', // or 'GET' if that's what your API needs
-      headers: {
-        'Content-Type': 'application/json',
-        // 'Authorization': 'Bearer YOUR_API_KEY' // Uncomment if needed
-      },
-      body: JSON.stringify({ dream: dreamText }) // Adjust to your API's expected input
+    const response = await fetch("http://localhost:3001/api/interpret", { // change to your backend URL in production!
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dream: dreamText })
     });
 
-    if (!response.ok) throw new Error('API error');
-    const apiResult = await response.json();
+    if (!response.ok) throw new Error("API error");
+    const result = await response.json();
 
-    // Adjust this line if your API returns the data under a different key
-    displayInterpretations(apiResult.interpretations || apiResult);
-
+    // Handle both array and structured responses
+    if (Array.isArray(result.interpretations)) {
+      // Flat interpretations array (from external API)
+      interpretationsContainer.innerHTML = "";
+      result.interpretations.forEach((entry, index) => {
+        // ... Use your existing card rendering logic ...
+      });
+      resultsSection.style.display = "block";
+    } else {
+      // Structured response (from local logic)
+      displayInterpretations(result);
+    }
   } catch (err) {
-    console.error(err);
-    errorMessage.textContent = 'An error occurred while interpreting your dream';
-    errorMessage.style.display = 'block';
+    errorMessage.textContent = "An error occurred while interpreting your dream";
+    errorMessage.style.display = "block";
   } finally {
-    loader.style.display = 'none';
+    loader.style.display = "none";
     btnText.innerHTML = '<i class="fas fa-crystal-ball"></i> Interpret Dream';
   }
 }
 
-// Event listeners
-interpretBtn.addEventListener('click', handleInterpretDream);
-
-dreamInput.addEventListener('keydown', (e) => {
-  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-    handleInterpretDream();
-  }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  dreamInput.value = "I was climbing a mountain and encountered a dog near water";
-});
+// ... rest of your JS and event listeners ...
