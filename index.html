@@ -1,273 +1,327 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dream Interpreter AI</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dream Interpreter AI</title>
 
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"  />
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"  />
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
 
-        body {
-            background-color: #f5f7fa;
-            color: #333;
-            line-height: 1.6;
-            padding: 20px;
-            min-height: 100vh;
-        }
+    body {
+      background-color: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 20px;
+    }
 
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-        }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
 
-        header {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
-            padding: 24px 16px;
-            text-align: center;
-        }
+    header {
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      color: white;
+      padding: 24px 16px;
+      text-align: center;
+    }
 
-        h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin: 0;
-        }
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
 
-        .dream-input {
-            padding: 24px 16px;
-            border-bottom: 1px solid #eee;
-        }
+    .subtitle {
+      font-size: 16px;
+      opacity: 0.9;
+    }
 
-        .dream-text {
-            font-size: 18px;
-            line-height: 1.5;
-            background: #f9f9f9;
-            padding: 16px;
-            border-radius: 12px;
-            resize: vertical;
-            width: 100%;
-            min-height: 150px;
-        }
+    .dream-input {
+      padding: 30px 20px;
+      border-bottom: 1px solid #eee;
+    }
 
-        .interpret-btn {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 16px 32px;
-            font-size: 18px;
-            font-weight: 600;
-            width: 100%;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(106, 17, 203, 0.3);
-            transition: all 0.3s ease;
-        }
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 20px;
+      font-size: 18px;
+      border: 2px solid #e6e9ff;
+      border-radius: 12px;
+      background: #f8f9ff;
+      resize: vertical;
+      transition: all 0.3s ease;
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
 
-        .interpret-btn:hover {
-            transform: translateY(-3px);
-        }
+    textarea:focus {
+      outline: none;
+      border-color: #6a11cb;
+      box-shadow: 0 0 0 4px rgba(106, 17, 203, 0.15);
+    }
 
-        .results-section {
-            padding: 16px;
-        }
+    .interpret-btn {
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 16px 32px;
+      font-size: 18px;
+      font-weight: 600;
+      width: 100%;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(106, 17, 203, 0.3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s ease;
+    }
 
-        .symbol-section {
-            margin-top: 24px;
-        }
+    .interpret-btn:hover {
+      transform: translateY(-3px);
+    }
 
-        .symbol-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-            padding: 16px;
-            margin-bottom: 16px;
-            border-left: 4px solid #6a11cb;
-        }
+    .results-section {
+      padding: 20px;
+      display: none;
+    }
 
-        .symbol-name {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #6a11cb;
-        }
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
 
-        .interpretation {
-            font-size: 16px;
-            line-height: 1.5;
-            color: #444;
-        }
+    .section-title i {
+      background: rgba(106, 17, 203, 0.1);
+      color: #6a11cb;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
 
-        .source {
-            font-size: 14px;
-            color: #7f8c8d;
-            margin-top: 8px;
-            font-style: italic;
-        }
+    .symbol-card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+      border-left: 4px solid #6a11cb;
+    }
 
-        .keyboard {
-            background: #e0e7ff;
-            border-radius: 12px;
-            padding: 12px;
-            margin-top: 24px;
-        }
+    .symbol-name {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      color: #6a11cb;
+    }
 
-        .key-row {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 8px;
-        }
+    .interpretation {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #444;
+      margin-bottom: 12px;
+    }
 
-        .key {
-            background: white;
-            border-radius: 8px;
-            width: 32px;
-            height: 42px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 3px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            font-weight: 500;
-        }
+    .source {
+      font-size: 0.85rem;
+      color: #7f8c8d;
+      font-style: italic;
+    }
 
-        .key.special {
-            background: #d0d9ff;
-            width: 50px;
-        }
+    .ad-section {
+      background: linear-gradient(135deg, #f8f9ff 0%, #edf0ff 100%);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 20px;
+      text-align: center;
+      border: 1px dashed rgba(106, 17, 203, 0.3);
+      position: relative;
+    }
 
-        .key.space {
-            width: 120px;
-        }
+    .ad-label {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ff6b6b;
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
 
-        .key.emoji {
-            width: 50px;
-            background: #ffd6e7;
-        }
+    .ad-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #6a11cb;
+      margin-bottom: 10px;
+    }
 
-        .keyboard-footer {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-            font-size: 14px;
-            color: #6a11cb;
-            font-weight: 500;
-        }
-    </style>
+    .ad-text {
+      font-size: 15px;
+      color: #4a4a68;
+      margin-bottom: 15px;
+    }
+
+    .ad-link {
+      display: inline-block;
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .ad-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(106, 17, 203, 0.3);
+    }
+
+    .error-message {
+      background: #ffebee;
+      color: #c62828;
+      padding: 16px;
+      border-radius: 12px;
+      margin: 20px 0;
+      display: none;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 40px 20px;
+      color: #a9abc0;
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    .watermark {
+      text-align: center;
+      margin: 20px;
+      font-size: 14px;
+      color: #a9abc0;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Dream Interpreter AI</h1>
-        </header>
+  <div class="container">
+    <header>
+      <h1>Dream Interpreter AI</h1>
+      <p class="subtitle">Understand your dreams across multiple traditions</p>
+    </header>
 
-        <div class="dream-input">
-            <textarea id="dream-text"
-                      placeholder="Describe your dream in detail...&#10;Example: 'I was climbing a steep mountain when I encountered a friendly dog near a waterfall'"
-                      class="dream-text">I was climbing a mountain and encountered a dog near water</textarea>
-
-            <button id="interpret-btn" class="interpret-btn">
-                <span id="btn-text"><i class="fas fa-crystal-ball"></i> Interpret Dream</span>
-            </button>
-
-            <div id="error-message" class="error-message" style="display: none;"></div>
-        </div>
-
-        <div class="results-section" id="results-section">
-            <div id="interpretations-container"></div>
-        </div>
-
-        <div class="keyboard">
-            <div class="key-row">
-                <div class="key">q<sup>1</sup></div>
-                <div class="key">w<sup>2</sup></div>
-                <div class="key">e<sup>3</sup></div>
-                <div class="key">r<sup>4</sup></div>
-                <div class="key">t<sup>5</sup></div>
-                <div class="key">y<sup>6</sup></div>
-                <div class="key">u<sup>7</sup></div>
-                <div class="key">i<sup>8</sup></div>
-                <div class="key">o<sup>9</sup></div>
-                <div class="key">p<sup>0</sup></div>
-            </div>
-            <div class="key-row">
-                <div class="key special">?123</div>
-                <div class="key">a<sup>e</sup></div>
-                <div class="key">s<sup>*</sup></div>
-                <div class="key">d<sup>e</sup></div>
-                <div class="key">f<sup>-</sup></div>
-                <div class="key">g<sup>g</sup></div>
-                <div class="key">h<sup>-</sup></div>
-                <div class="key">j<sup>*</sup></div>
-                <div class="key">k<sup>'</sup></div>
-                <div class="key">l<sup>'</sup></div>
-            </div>
-            <div class="key-row">
-                <div class="key space">Space</div>
-                <div class="key">z<sup>*</sup></div>
-                <div class="key">x<sup>*</sup></div>
-                <div class="key">c<sup>*</sup></div>
-                <div class="key">v<sup>*</sup></div>
-                <div class="key">b<sup>*</sup></div>
-                <div class="key">n<sup>*</sup></div>
-                <div class="key">m<sup>*</sup></div>
-                <div class="key emoji">😊</div>
-            </div>
-            <div class="keyboard-footer">
-                <span>Waterstones</span>
-                <span>Qwen AI v1.0</span>
-            </div>
-        </div>
+    <div class="dream-input">
+      <textarea id="dream-text" placeholder="Describe your dream in detail...&#10;Example: 'I was climbing a steep mountain when I encountered a friendly dog near a waterfall'">I was climbing a mountain and encountered a dog near water</textarea>
+      <button id="interpret-btn" class="interpret-btn">
+        <i class="fas fa-crystal-ball"></i> Interpret Dream
+      </button>
+      <div id="error-message" class="error-message"></div>
     </div>
 
-    <script>
-        // Define interpretation sources
-        const interpretationSources = [
-            { name: "Hinduism", icon: "om", color: "#FF6B6B" },
-            { name: "Islamic Tradition", icon: "moon", color: "#4CAF50" },
-            { name: "Ancient Egyptian", icon: "ankh", color: "#FF9800" },
-            { name: "Taoism", icon: "yin-yang", color: "#2196F3" },
-            { name: "Judaism", icon: "star-of-david", color: "#9C27B0" },
-            { name: "Buddhism", icon: "lotus", color: "#E91E63" },
-            { name: "Christian Mysticism", icon: "cross", color: "#3F51B5" },
-            { name: "Zoroastrianism", icon: "fire", color: "#FF5722" },
-            { name: "Sikhism", icon: "khanda", color: "#00BCD4" },
-            { name: "Freudian Analysis", icon: "brain", color: "#795548" },
-            { name: "Jungian Psychology", icon: "mask", color: "#607D8B" },
-            { name: "Miller's 12,000 Dreams", icon: "book", color: "#673AB7" }
-        ];
+    <div class="results-section" id="results-section">
+      <div id="interpretations-container">
+        <div class="no-results">
+          Enter your dream above and click "Interpret Dream"
+        </div>
+      </div>
 
-        // Interpretations library
-        const interpretationsLibrary = {
-            mountain: [
-                "Represents life challenges and obstacles you're facing",
-                "Symbolizes spiritual growth and the journey to enlightenment",
-                "Indicates a major goal that requires effort to achieve",
-                "Suggests you need to gain perspective on a situation"
-            ],
-            water: [
-                "Represents your emotions and subconscious mind",
-                "Symbolizes purification, cleansing, and renewal",
-                "Indicates the flow of life and adaptability",
-                "Suggests deep emotional issues that need attention"
-            ],
-            dog: [
-                "Represents loyalty, friendship, and protection",
-                "Symbolizes your instincts and intuition",
-                "Indicates a faithful companion or trustworthy ally",
-                "Suggests the need for more playfulness in your life"
-            ]
-        };
+      <div class="ad-section">
+        <div class="ad-label">SPONSORED</div>
+        <div class="ad-title">Dream Dictionary Pro</div>
+        <div class="ad-text">Unlock deeper insights with our premium dream encyclopedia</div>
+        <a href="#" class="ad-link">Get Premium Access</a>
+      </div>
+    </div>
 
-        // References
+    <div class="watermark">
+      Powered by Qwen AI • DreamScape v1.0
+    </div>
+  </div>
+
+  <script>
+    // Define interpretation sources
+    const interpretationSources = [
+      { name: "Hinduism (Vedanta)", icon: "om", color: "#FF6B6B" },
+      { name: "Islamic Tradition", icon: "moon", color: "#4CAF50" },
+      { name: "Ancient Egyptian", icon: "ankh", color: "#FF9800" },
+      { name: "Taoism", icon: "yin-yang", color: "#2196F3" },
+      { name: "Judaism (Kabbalah)", icon: "star-of-david", color: "#9C27B0" },
+      { name: "Buddhism", icon: "lotus", color: "#E91E63" },
+      { name: "Christian Mysticism", icon: "cross", color: "#3F51B5" },
+      { name: "Zoroastrianism", icon: "fire", color: "#FF5722" },
+      { name: "Sikhism", icon: "khanda", color: "#00BCD4" },
+      { name: "Freudian Analysis", icon: "brain", color: "#795548" },
+      { name: "Jungian Psychology", icon: "mask", color: "#607D8B" },
+      { name: "Miller's 12,000 Dreams", icon: "book", color: "#673AB7" }
+    ];
+
+    // Symbol interpretations library
+    const interpretationsLibrary = {
+      mountain: [
+        "Represents life challenges and obstacles you're facing",
+        "Symbolizes spiritual growth and the journey to enlightenment",
+        "Indicates a major goal that requires effort to achieve",
+        "Suggests you need to gain perspective on a situation"
+      ],
+      water: [
+        "Represents your emotions and subconscious mind",
+        "Symbolizes purification, cleansing, and renewal",
+        "Indicates the flow of life and adaptability",
+        "Suggests deep emotional issues that need attention"
+      ],
+      dog: [
+        "Represents loyalty, friendship, and protection",
+        "Symbolizes your instincts and intuition",
+        "Indicates a faithful companion or trustworthy ally",
+        "Suggests the need for more playfulness in your life"
+      ]
+    };
+
+    // References library
+    const referencesLibrary = [
+      "Bhagavad Gita 2:22 (Hinduism)",
+      "Ibn Sirin's Ta'bir al-Ru'ya (Islamic)",
+      "Book of the Dead, Spell 17 (Egyptian)",
+      "Tao Te Ching, Ch. 32 (Taoism)",
+      "Zohar I, 224a (Kabbalah)",
+      "Dhammapada 153-154 (Buddhism)",
+      "St. John of the Cross, Dark Night of the Soul (Christian)",
+      "Vendidad 5:45-46 (Zoroastrianism)",
+      "Guru Granth Sahib, Ang 142 (Sikhism)",
+      "Freud, S. The Interpretation of Dreams",
+      "Jung, C.G. Man and His Symbols",
+      "Miller, G.H. 10,000 Dreams Interpreted #7,812"
+    ];
+
+    // DOM Elements
+    const dreamInput = document.getElementById("dream-text");
+    const interpretBtn = document.getElementById("interpret-btn");
+    const interpretationsContainer =
