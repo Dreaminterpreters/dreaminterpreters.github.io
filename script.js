@@ -1,5 +1,3 @@
-// DreamScape AI Interpretation Script
-
 // Source traditions with keys for matching
 const interpretationSources = [
   { key: "hinduism", name: "Hinduism (Vedanta)", icon: "book", color: "#FF6B6B" },
@@ -7,13 +5,7 @@ const interpretationSources = [
   { key: "egyptian", name: "Ancient Egyptian", icon: "user-secret", color: "#FF9800" },
   { key: "taoism", name: "Taoism", icon: "yin-yang", color: "#2196F3" },
   { key: "kabbalah", name: "Judaism (Kabbalah)", icon: "star-of-david", color: "#9C27B0" },
-  { key: "buddhism", name: "Buddhism", icon: "spa", color: "#E91E63" },
-  { key: "christian", name: "Christian Mysticism", icon: "cross", color: "#3F51B5" },
-  { key: "zoroastrianism", name: "Zoroastrianism", icon: "fire", color: "#FF5722" },
-  { key: "sikhism", name: "Sikhism", icon: "book", color: "#00BCD4" },
-  { key: "freud", name: "Freudian Analysis", icon: "brain", color: "#795548" },
-  { key: "jungian", name: "Jungian Psychology", icon: "mask", color: "#607D8B" },
-  { key: "miller", name: "Miller's 12,000 Dreams", icon: "book", color: "#673AB7" }
+  { key: "jungian", name: "Jungian Psychology", icon: "mask", color: "#607D8B" }
 ];
 
 // Symbol interpretations by tradition/source
@@ -60,10 +52,8 @@ const interpretationsLibrary = {
       reference: "Jungian Archetypes (Collective Unconscious)"
     }
   }
-  // Add more symbols and traditions as needed
 };
 
-// References library (for fallback)
 const referencesLibrary = [
   "Bhagavad Gita 2:22 (Hinduism)",
   "Ibn Sirin's Ta'bir al-Ru'ya (Islamic)",
@@ -109,7 +99,6 @@ function getRandomMeaning() {
   return meanings[Math.floor(Math.random() * meanings.length)];
 }
 
-// Generate a random reflection for the overview
 function getRandomReflection() {
   const reflections = [
     "your subconscious processing daily experiences",
@@ -121,7 +110,6 @@ function getRandomReflection() {
   return reflections[Math.floor(Math.random() * reflections.length)];
 }
 
-// Format interpretations for display
 function formatInterpretations(dreamText, symbols) {
   const result = {
     overview: {
@@ -132,10 +120,10 @@ function formatInterpretations(dreamText, symbols) {
   };
 
   symbols.forEach(symbol => {
-    const interpretations = [];
+    let interpretations = [];
     const traditions = interpretationsLibrary[symbol];
     if (traditions) {
-      // Choose up to 2 random traditions for variety
+      // Pick up to 2 random traditions for the symbol
       const keys = Object.keys(traditions);
       const chosenKeys = [];
       while (chosenKeys.length < 2 && chosenKeys.length < keys.length) {
@@ -154,7 +142,7 @@ function formatInterpretations(dreamText, symbols) {
         });
       });
     } else {
-      // Fallback for unknown symbols
+      // Fallback
       interpretations.push({
         source: "General",
         icon: "book",
@@ -163,7 +151,6 @@ function formatInterpretations(dreamText, symbols) {
         reference: referencesLibrary[Math.floor(Math.random() * referencesLibrary.length)]
       });
     }
-
     result.symbols.push({
       symbol: symbol.charAt(0).toUpperCase() + symbol.slice(1),
       interpretations
@@ -173,11 +160,10 @@ function formatInterpretations(dreamText, symbols) {
   return result;
 }
 
-// Display interpretations in the DOM
 function displayInterpretations(data) {
   interpretationsContainer.innerHTML = '';
 
-  // Show overview card
+  // Overview card
   const overviewCard = document.createElement('div');
   overviewCard.className = 'symbol-card';
   overviewCard.innerHTML = `
@@ -186,7 +172,7 @@ function displayInterpretations(data) {
   `;
   interpretationsContainer.appendChild(overviewCard);
 
-  // Show each symbol's interpretations
+  // Symbol interpretations
   data.symbols.forEach((symbolGroup, index) => {
     const section = document.createElement('div');
     section.className = 'symbol-card fade-in';
@@ -231,7 +217,6 @@ function displayInterpretations(data) {
   resultsSection.style.display = 'block';
 }
 
-// Main handler
 async function handleInterpretDream() {
   const dreamText = dreamInput.value.trim();
 
@@ -270,15 +255,12 @@ async function handleInterpretDream() {
 
 // Event listeners
 interpretBtn.addEventListener('click', handleInterpretDream);
-
-// Optional: Allow pressing Enter+Ctrl (or Cmd+Enter) to submit
 dreamInput.addEventListener('keydown', (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
     handleInterpretDream();
   }
 });
 
-// Initialize with sample dream
 document.addEventListener('DOMContentLoaded', () => {
   dreamInput.value = "I was climbing a mountain and encountered a dog near water";
   // Optionally, trigger an initial interpretation:
