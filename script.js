@@ -271,7 +271,7 @@ async function handleInterpretDream() {
 // Event listeners
 interpretBtn.addEventListener('click', handleInterpretDream);
 
-// Optional: Allow pressing Enter+Ctrl to submit
+// Optional: Allow pressing Enter+Ctrl (or Cmd+Enter) to submit
 dreamInput.addEventListener('keydown', (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
     handleInterpretDream();
@@ -281,6 +281,6 @@ dreamInput.addEventListener('keydown', (e) => {
 // Initialize with sample dream
 document.addEventListener('DOMContentLoaded', () => {
   dreamInput.value = "I was climbing a mountain and encountered a dog near water";
-  // Optionally, trigger an initial interpretation here if desired
+  // Optionally, trigger an initial interpretation:
   // handleInterpretDream();
 });
