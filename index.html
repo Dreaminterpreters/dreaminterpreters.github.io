@@ -4,59 +4,270 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dream Interpreter AI</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="manifest" href="manifest.json" />
-    <meta name="theme-color" content="#6a11cb" />
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"  />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 24px 16px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .dream-input {
+            padding: 24px 16px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .dream-text {
+            font-size: 18px;
+            line-height: 1.5;
+            background: #f9f9f9;
+            padding: 16px;
+            border-radius: 12px;
+            resize: vertical;
+            width: 100%;
+            min-height: 150px;
+        }
+
+        .interpret-btn {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 16px 32px;
+            font-size: 18px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(106, 17, 203, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .interpret-btn:hover {
+            transform: translateY(-3px);
+        }
+
+        .results-section {
+            padding: 16px;
+        }
+
+        .symbol-section {
+            margin-top: 24px;
+        }
+
+        .symbol-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            padding: 16px;
+            margin-bottom: 16px;
+            border-left: 4px solid #6a11cb;
+        }
+
+        .symbol-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #6a11cb;
+        }
+
+        .interpretation {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #444;
+        }
+
+        .source {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .keyboard {
+            background: #e0e7ff;
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 24px;
+        }
+
+        .key-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .key {
+            background: white;
+            border-radius: 8px;
+            width: 32px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 3px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-weight: 500;
+        }
+
+        .key.special {
+            background: #d0d9ff;
+            width: 50px;
+        }
+
+        .key.space {
+            width: 120px;
+        }
+
+        .key.emoji {
+            width: 50px;
+            background: #ffd6e7;
+        }
+
+        .keyboard-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 14px;
+            color: #6a11cb;
+            font-weight: 500;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <header>
-            <h1>DreamScape AI</h1>
-            <p class="subtitle">Understand your dreams across multiple traditions</p>
+            <h1>Dream Interpreter AI</h1>
         </header>
 
-        <!-- Input Section -->
         <div class="dream-input">
-            <textarea 
-                id="dream-text"
-                placeholder="Describe your dream in detail...&#10;Example: 'I was climbing a steep mountain when I encountered a friendly dog near a waterfall'"
-            >I was climbing a mountain and encountered a dog near water</textarea>
+            <textarea id="dream-text"
+                      placeholder="Describe your dream in detail...&#10;Example: 'I was climbing a steep mountain when I encountered a friendly dog near a waterfall'"
+                      class="dream-text">I was climbing a mountain and encountered a dog near water</textarea>
+
             <button id="interpret-btn" class="interpret-btn">
-                <div class="loader" id="loader"></div>
                 <span id="btn-text"><i class="fas fa-crystal-ball"></i> Interpret Dream</span>
             </button>
-            <div class="error-message" id="error-message"></div>
+
+            <div id="error-message" class="error-message" style="display: none;"></div>
         </div>
 
-        <!-- Results Section -->
         <div class="results-section" id="results-section">
-            <div class="section-title">
-                <i class="fas fa-stars"></i>
-                <span>Dream Analysis</span>
-            </div>
-            <div id="interpretations-container">
-                <div class="no-results">
-                    Enter your dream above and click "Interpret Dream"
-                </div>
-            </div>
-
-            <!-- Minimal Sponsored Content -->
-            <div class="ad-section">
-                <div class="ad-label">SPONSORED</div>
-                <div class="ad-title">Dream Dictionary Pro</div>
-                <div class="ad-text">Unlock deeper insights with our premium dream encyclopedia</div>
-                <a href="#" class="ad-link">Get Premium Access</a>
-            </div>
+            <div id="interpretations-container"></div>
         </div>
 
-        <!-- Footer -->
-        <footer class="watermark">
-            Powered by Qwen AI • DreamScape v1.0
-        </footer>
-
-        <!-- Font Awesome -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script> 
+        <div class="keyboard">
+            <div class="key-row">
+                <div class="key">q<sup>1</sup></div>
+                <div class="key">w<sup>2</sup></div>
+                <div class="key">e<sup>3</sup></div>
+                <div class="key">r<sup>4</sup></div>
+                <div class="key">t<sup>5</sup></div>
+                <div class="key">y<sup>6</sup></div>
+                <div class="key">u<sup>7</sup></div>
+                <div class="key">i<sup>8</sup></div>
+                <div class="key">o<sup>9</sup></div>
+                <div class="key">p<sup>0</sup></div>
+            </div>
+            <div class="key-row">
+                <div class="key special">?123</div>
+                <div class="key">a<sup>e</sup></div>
+                <div class="key">s<sup>*</sup></div>
+                <div class="key">d<sup>e</sup></div>
+                <div class="key">f<sup>-</sup></div>
+                <div class="key">g<sup>g</sup></div>
+                <div class="key">h<sup>-</sup></div>
+                <div class="key">j<sup>*</sup></div>
+                <div class="key">k<sup>'</sup></div>
+                <div class="key">l<sup>'</sup></div>
+            </div>
+            <div class="key-row">
+                <div class="key space">Space</div>
+                <div class="key">z<sup>*</sup></div>
+                <div class="key">x<sup>*</sup></div>
+                <div class="key">c<sup>*</sup></div>
+                <div class="key">v<sup>*</sup></div>
+                <div class="key">b<sup>*</sup></div>
+                <div class="key">n<sup>*</sup></div>
+                <div class="key">m<sup>*</sup></div>
+                <div class="key emoji">😊</div>
+            </div>
+            <div class="keyboard-footer">
+                <span>Waterstones</span>
+                <span>Qwen AI v1.0</span>
+            </div>
+        </div>
     </div>
-</body>
-</html>
+
+    <script>
+        // Define interpretation sources
+        const interpretationSources = [
+            { name: "Hinduism", icon: "om", color: "#FF6B6B" },
+            { name: "Islamic Tradition", icon: "moon", color: "#4CAF50" },
+            { name: "Ancient Egyptian", icon: "ankh", color: "#FF9800" },
+            { name: "Taoism", icon: "yin-yang", color: "#2196F3" },
+            { name: "Judaism", icon: "star-of-david", color: "#9C27B0" },
+            { name: "Buddhism", icon: "lotus", color: "#E91E63" },
+            { name: "Christian Mysticism", icon: "cross", color: "#3F51B5" },
+            { name: "Zoroastrianism", icon: "fire", color: "#FF5722" },
+            { name: "Sikhism", icon: "khanda", color: "#00BCD4" },
+            { name: "Freudian Analysis", icon: "brain", color: "#795548" },
+            { name: "Jungian Psychology", icon: "mask", color: "#607D8B" },
+            { name: "Miller's 12,000 Dreams", icon: "book", color: "#673AB7" }
+        ];
+
+        // Interpretations library
+        const interpretationsLibrary = {
+            mountain: [
+                "Represents life challenges and obstacles you're facing",
+                "Symbolizes spiritual growth and the journey to enlightenment",
+                "Indicates a major goal that requires effort to achieve",
+                "Suggests you need to gain perspective on a situation"
+            ],
+            water: [
+                "Represents your emotions and subconscious mind",
+                "Symbolizes purification, cleansing, and renewal",
+                "Indicates the flow of life and adaptability",
+                "Suggests deep emotional issues that need attention"
+            ],
+            dog: [
+                "Represents loyalty, friendship, and protection",
+                "Symbolizes your instincts and intuition",
+                "Indicates a faithful companion or trustworthy ally",
+                "Suggests the need for more playfulness in your life"
+            ]
+        };
+
+        // References
