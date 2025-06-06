@@ -89,7 +89,7 @@ async function handleInterpretDream() {
 
   try {
     // --- SEND THE DREAM TO YOUR API HERE ---
-    const response = await fetch(' sk-e27228439d134b719c8e0f8624e89fa2', {
+    const response = await fetch('https://api.deepseek.com/v1/dream', {
       method: 'POST', // or 'GET' if that's what your API needs
       headers: {
         'Content-Type': 'application/json',
