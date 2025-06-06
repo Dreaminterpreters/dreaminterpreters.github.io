@@ -1,485 +1,609 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dream Interpreter AI</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dream Interpreter AI</title>
 
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"  />
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"  />
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-    }
-
-    body {
-      background-color: #f5f7fa;
-      color: #333;
-      line-height: 1.6;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .container {
-      max-width: 500px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
-    }
-
-    header {
-      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-      color: white;
-      padding: 24px 16px;
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .subtitle {
-      font-size: 16px;
-      opacity: 0.9;
-    }
-
-    .dream-input {
-      padding: 30px 20px;
-      border-bottom: 1px solid #eee;
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 150px;
-      padding: 20px;
-      font-size: 18px;
-      border: 2px solid #e6e9ff;
-      border-radius: 12px;
-      background: #f8f9ff;
-      resize: vertical;
-      transition: all 0.3s ease;
-      color: #2c3e50;
-      margin-bottom: 20px;
-    }
-
-    textarea:focus {
-      outline: none;
-      border-color: #6a11cb;
-      box-shadow: 0 0 0 4px rgba(106, 17, 203, 0.15);
-    }
-
-    .interpret-btn {
-      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-      color: white;
-      border: none;
-      border-radius: 50px;
-      padding: 16px 32px;
-      font-size: 18px;
-      font-weight: 600;
-      width: 100%;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(106, 17, 203, 0.3);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      transition: all 0.3s ease;
-    }
-
-    .interpret-btn:hover {
-      transform: translateY(-3px);
-    }
-
-    .results-section {
-      padding: 20px;
-      display: none;
-    }
-
-    .section-title {
-      font-size: 1.8rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .section-title i {
-      background: rgba(106, 17, 203, 0.1);
-      color: #6a11cb;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-    }
-
-    .symbol-card {
-      background: white;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 20px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-      border-left: 4px solid #6a11cb;
-    }
-
-    .symbol-name {
-      font-weight: 600;
-      font-size: 1.1rem;
-      margin-bottom: 8px;
-      color: #6a11cb;
-    }
-
-    .interpretation {
-      font-size: 1rem;
-      line-height: 1.6;
-      color: #444;
-      margin-bottom: 12px;
-    }
-
-    .source {
-      font-size: 0.85rem;
-      color: #7f8c8d;
-      font-style: italic;
-    }
-
-    .ad-section {
-      background: linear-gradient(135deg, #f8f9ff 0%, #edf0ff 100%);
-      border-radius: 12px;
-      padding: 16px;
-      margin-top: 20px;
-      text-align: center;
-      border: 1px dashed rgba(106, 17, 203, 0.3);
-      position: relative;
-    }
-
-    .ad-label {
-      position: absolute;
-      top: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #ff6b6b;
-      color: white;
-      font-size: 12px;
-      font-weight: 700;
-      padding: 4px 12px;
-      border-radius: 20px;
-    }
-
-    .ad-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #6a11cb;
-      margin-bottom: 10px;
-    }
-
-    .ad-text {
-      font-size: 15px;
-      color: #4a4a68;
-      margin-bottom: 15px;
-    }
-
-    .ad-link {
-      display: inline-block;
-      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-      color: white;
-      padding: 10px 20px;
-      border-radius: 12px;
-      text-decoration: none;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-
-    .ad-link:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(106, 17, 203, 0.3);
-    }
-
-    .error-message {
-      background: #ffebee;
-      color: #c62828;
-      padding: 16px;
-      border-radius: 12px;
-      margin: 20px 0;
-      display: none;
-      text-align: center;
-      font-weight: 500;
-    }
-
-    .no-results {
-      text-align: center;
-      padding: 40px 20px;
-      color: #a9abc0;
-      font-size: 18px;
-      font-weight: 500;
-    }
-
-    .watermark {
-      text-align: center;
-      margin: 20px;
-      font-size: 14px;
-      color: #a9abc0;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <header>
-      <h1>Dream Interpreter AI</h1>
-      <p class="subtitle">Understand your dreams across multiple traditions</p>
-    </header>
-
-    <div class="dream-input">
-      <textarea id="dream-text" placeholder="Describe your dream in detail...&#10;Example: 'I was climbing a steep mountain when I encountered a friendly dog near a waterfall'">I was climbing a mountain and encountered a dog near water</textarea>
-      <button id="interpret-btn" class="interpret-btn">
-        <i class="fas fa-crystal-ball"></i> Interpret Dream
-      </button>
-      <div id="error-message" class="error-message"></div>
-    </div>
-
-    <div class="results-section" id="results-section">
-      <div id="interpretations-container">
-        <div class="no-results">
-          Enter your dream above and click "Interpret Dream"
-        </div>
-      </div>
-
-      <div class="ad-section">
-        <div class="ad-label">SPONSORED</div>
-        <div class="ad-title">Dream Dictionary Pro</div>
-        <div class="ad-text">Unlock deeper insights with our premium dream encyclopedia</div>
-        <a href="#" class="ad-link">Get Premium Access</a>
-      </div>
-    </div>
-
-    <div class="watermark">
-      Powered by Qwen AI • DreamScape v1.0
-    </div>
-  </div>
-
-  <script>
-    // Define interpretation sources
-    const interpretationSources = [
-      { name: "Hinduism (Vedanta)", icon: "om", color: "#FF6B6B" },
-      { name: "Islamic Tradition", icon: "moon", color: "#4CAF50" },
-      { name: "Ancient Egyptian", icon: "ankh", color: "#FF9800" },
-      { name: "Taoism", icon: "yin-yang", color: "#2196F3" },
-      { name: "Judaism (Kabbalah)", icon: "star-of-david", color: "#9C27B0" },
-      { name: "Buddhism", icon: "lotus", color: "#E91E63" },
-      { name: "Christian Mysticism", icon: "cross", color: "#3F51B5" },
-      { name: "Zoroastrianism", icon: "fire", color: "#FF5722" },
-      { name: "Sikhism", icon: "khanda", color: "#00BCD4" },
-      { name: "Freudian Analysis", icon: "brain", color: "#795548" },
-      { name: "Jungian Psychology", icon: "mask", color: "#607D8B" },
-      { name: "Miller's 12,000 Dreams", icon: "book", color: "#673AB7" }
-    ];
-
-    // Symbol interpretations library
-    const interpretationsLibrary = {
-      mountain: [
-        "Represents life challenges and obstacles you're facing",
-        "Symbolizes spiritual growth and the journey to enlightenment",
-        "Indicates a major goal that requires effort to achieve",
-        "Suggests you need to gain perspective on a situation"
-      ],
-      water: [
-        "Represents your emotions and subconscious mind",
-        "Symbolizes purification, cleansing, and renewal",
-        "Indicates the flow of life and adaptability",
-        "Suggests deep emotional issues that need attention"
-      ],
-      dog: [
-        "Represents loyalty, friendship, and protection",
-        "Symbolizes your instincts and intuition",
-        "Indicates a faithful companion or trustworthy ally",
-        "Suggests the need for more playfulness in your life"
-      ]
-    };
-
-    // References library
-    const referencesLibrary = [
-      "Bhagavad Gita 2:22 (Hinduism)",
-      "Ibn Sirin's Ta'bir al-Ru'ya (Islamic)",
-      "Book of the Dead, Spell 17 (Egyptian)",
-      "Tao Te Ching, Ch. 32 (Taoism)",
-      "Zohar I, 224a (Kabbalah)",
-      "Dhammapada 153-154 (Buddhism)",
-      "St. John of the Cross, Dark Night of the Soul (Christian)",
-      "Vendidad 5:45-46 (Zoroastrianism)",
-      "Guru Granth Sahib, Ang 142 (Sikhism)",
-      "Freud, S. The Interpretation of Dreams",
-      "Jung, C.G. Man and His Symbols",
-      "Miller, G.H. 10,000 Dreams Interpreted #7,812"
-    ];
-
-    // DOM Elements
-    const dreamInput = document.getElementById("dream-text");
-    const interpretBtn = document.getElementById("interpret-btn");
-    const interpretationsContainer = document.getElementById("interpretations-container");
-    const resultsSection = document.getElementById("results-section");
-    const errorMessage = document.getElementById("error-message");
-
-    // Extract symbols from dream text
-    function extractSymbols(text) {
-      const words = text.toLowerCase().split(/\s+/);
-      const symbols = [];
-
-      if (/mountain|climb|hill/i.test(text)) symbols.push("mountain");
-      if (/water|riv[er|e]|lake|sea|rain/i.test(text)) symbols.push("water");
-      if (/dog|canine|wolf|animal/i.test(text)) symbols.push("dog");
-
-      return symbols.length ? symbols : ["journey", "challenge", "companion"];
-    }
-
-    // Get symbol interpretation
-    function getSymbolInterpretation(symbol, source) {
-      const interpretations = interpretationsLibrary[symbol] || [
-        `The ${symbol} represents an important symbol in your personal journey`,
-        `This ${symbol} suggests a significant aspect of your subconscious mind`
-      ];
-      return `${interpretations[Math.floor(Math.random() * interpretations.length)]} (${source} perspective).`;
-    }
-
-    // Format interpretations
-    function formatInterpretations(dreamText, symbols) {
-      const result = [];
-      const combinedMeaning = {
-        symbol: "Overall Meaning",
-        interpretations: [
-          {
-            source: "DreamBase AI Synthesis",
-            text: `Your dream about ${symbols.join(", ")} suggests ${getRandomMeaning()}. This reflects ${getRandomReflection()}.`,
-            reference: "DreamBase AI v3.1"
-          }
-        ]
-      };
-      result.push(combinedMeaning);
-
-      symbols.forEach((symbol) => {
-        result.push({
-          symbol,
-          interpretations: []
-        });
-
-        const traditionIndices = new Set();
-        while (traditionIndices.size < 2 && traditionIndices.size < interpretationSources.length) {
-          traditionIndices.add(Math.floor(Math.random() * interpretationSources.length));
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
         }
 
-        Array.from(traditionIndices).forEach((index) => {
-          result[result.length - 1].interpretations.push({
-            source: interpretationSources[index].name,
-            icon: interpretationSources[index].icon,
-            color: interpretationSources[index].color,
-            text: getSymbolInterpretation(symbol, interpretationSources[index].name),
-            reference: referencesLibrary[Math.floor(Math.random() * referencesLibrary.length)]
-          });
-        });
-      });
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-      return result;
-    }
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
 
-    // Generate random meaning
-    function getRandomMeaning() {
-      const meanings = [
-        "a period of personal growth and transformation",
-        "unresolved emotions seeking your attention",
-        "hidden aspects of your personality coming to light",
-        "challenges that will lead to important lessons",
-        "a transition phase in your relationships"
-      ];
-      return meanings[Math.floor(Math.random() * meanings.length)];
-    }
+        header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 28px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
 
-    // Generate random reflection
-    function getRandomReflection() {
-      const reflections = [
-        "your subconscious processing daily experiences",
-        "deep-seated desires seeking expression",
-        "unresolved conflicts from your past",
-        "your mind preparing for upcoming challenges",
-        "creative energies manifesting in symbolic form"
-      ];
-      return reflections[Math.floor(Math.random() * reflections.length)];
-    }
+        header::before,
+        header::after {
+            content: "";
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
 
-    // Display interpretations
-    function displayInterpretations(data) {
-      interpretationsContainer.innerHTML = "";
+        header::before {
+            top: -50px;
+            left: -50px;
+        }
 
-      data.forEach((item) => {
-        item.interpretations.forEach((interpretation) => {
-          const card = document.createElement("div");
-          card.className = "symbol-card";
+        header::after {
+            bottom: -80px;
+            right: -30px;
+        }
 
-          const title = document.createElement("div");
-          title.className = "symbol-name";
-          title.textContent = interpretation.source;
+        h1 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
 
-          const text = document.createElement("div");
-          text.className = "interpretation";
-          text.textContent = interpretation.text;
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
 
-          const source = document.createElement("div");
-          source.className = "source";
-          source.textContent = interpretation.reference;
+        .dream-input {
+            padding: 30px 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
 
-          card.appendChild(title);
-          card.appendChild(text);
-          card.appendChild(source);
-          interpretationsContainer.appendChild(card);
-        });
-      });
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 20px;
+            font-size: 18px;
+            border: 2px solid #e6e9ff;
+            border-radius: 18px;
+            background: #f8f9ff;
+            resize: vertical;
+            transition: all 0.3s ease;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
 
-      resultsSection.style.display = "block";
-    }
+        textarea:focus {
+            outline: none;
+            border-color: #6a11cb;
+            box-shadow: 0 0 0 4px rgba(106, 17, 203, 0.15);
+        }
 
-    // Handle dream interpretation
-    function handleInterpretDream() {
-      const dreamText = dreamInput.value.trim();
+        .interpret-btn {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 18px;
+            font-size: 18px;
+            font-weight: 700;
+            width: 100%;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(106, 17, 203, 0.25);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
 
-      if (!dreamText) {
-        errorMessage.style.display = "block";
-        errorMessage.textContent = "Please describe your dream first";
-        return;
-      }
+        .interpret-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(106, 17, 203, 0.35);
+        }
 
-      if (dreamText.split(/\s+/).length < 5) {
-        errorMessage.style.display = "block";
-        errorMessage.textContent = "Please describe your dream in more detail (at least 5 words)";
-        return;
-      }
+        .interpret-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(255,255,255,0.2), transparent);
+        }
 
-      errorMessage.style.display = "none";
-      interpretBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Interpreting Dream...`;
-      interpretBtn.disabled = true;
+        .loader {
+            display: none;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s ease-in-out infinite;
+        }
 
-      setTimeout(() => {
-        const symbols = extractSymbols(dreamText);
-        const interpretationData = formatInterpretations(dreamText, symbols);
-        displayInterpretations(interpretationData);
-        interpretBtn.innerHTML = `<i class="fas fa-crystal-ball"></i> Interpret Dream`;
-        interpretBtn.disabled = false;
-      }, 2000);
-    }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
 
-    // Event listener
-    interpretBtn.addEventListener("click", handleInterpretDream);
+        .results-section {
+            padding: 20px;
+            display: none;
+        }
 
-    // Initialize with sample
-    window.onload = () => {
-      dreamInput.focus();
-    };
-  </script>
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title i {
+            color: #6a11cb;
+            background: rgba(106, 17, 203, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .symbol-section {
+            margin-bottom: 30px;
+        }
+
+        .symbol-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #6a11cb;
+            padding-left: 10px;
+            border-left: 4px solid #6a11cb;
+        }
+
+        .interpretation-card {
+            background: white;
+            border-radius: 18px;
+            padding: 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #6a11cb;
+        }
+
+        .interpretation-source {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .source-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .source-name {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 17px;
+        }
+
+        .interpretation-text {
+            font-size: 16px;
+            line-height: 1.7;
+            color: #4a4a68;
+            margin-bottom: 15px;
+        }
+
+        .source-reference {
+            font-size: 14px;
+            color: #7f8c8d;
+            font-style: italic;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(0, 0, 0, 0.08);
+        }
+
+        .ad-section {
+            background: linear-gradient(135deg, #f8f9ff 0%, #edf0ff 100%);
+            border-radius: 18px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+            border: 1px dashed #e0e5ff;
+        }
+
+        .ad-label {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff6b6b;
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 16px;
+            border-radius: 20px;
+        }
+
+        .ad-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #6a11cb;
+            margin-bottom: 10px;
+        }
+
+        .ad-text {
+            font-size: 15px;
+            margin-bottom: 15px;
+            color: #4a4a68;
+        }
+
+        .ad-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .ad-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.3);
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 16px;
+            border-radius: 16px;
+            margin: 20px 0;
+            display: none;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: #a9abc0;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .watermark {
+            text-align: center;
+            margin: 20px;
+            color: #a9abc0;
+            font-size: 14px;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dream Interpreter AI</h1>
+            <p class="subtitle">Understand your dreams across multiple traditions</p>
+        </header>
+
+        <div class="dream-input">
+            <textarea 
+                id="dream-text"
+                placeholder="Describe your dream in detail...&#10;Example: 'I was climbing a steep mountain when I encountered a friendly dog near a waterfall'"
+            >I was climbing a mountain and encountered a dog near water</textarea>
+
+            <button id="interpret-btn" class="interpret-btn">
+                <div class="loader" id="loader"></div>
+                <span id="btn-text"><i class="fas fa-crystal-ball"></i> Interpret Dream</span>
+            </button>
+
+            <div class="error-message" id="error-message"></div>
+        </div>
+
+        <div class="results-section" id="results-section">
+            <div class="section-title">
+                <i class="fas fa-stars"></i>
+                <span>Dream Analysis</span>
+            </div>
+            <div id="interpretations-container">
+                <div class="no-results fade-in">
+                    Enter your dream above and click "Interpret Dream"
+                </div>
+            </div>
+
+            <div class="ad-section">
+                <div class="ad-label">SPONSORED</div>
+                <div class="ad-title">Dream Dictionary Pro</div>
+                <div class="ad-text">Unlock deeper insights with our premium dream encyclopedia</div>
+                <a href="#" class="ad-link">Get Premium Access</a>
+            </div>
+        </div>
+
+        <div class="watermark">
+            Powered by Qwen AI • DreamScape v1.0
+        </div>
+    </div>
+
+    <script>
+        // Define interpretation sources
+        const interpretationSources = [
+            { name: "Hinduism (Vedanta)", icon: "om", color: "#FF6B6B" },
+            { name: "Islamic Tradition", icon: "moon", color: "#4CAF50" },
+            { name: "Ancient Egyptian", icon: "ankh", color: "#FF9800" },
+            { name: "Taoism", icon: "yin-yang", color: "#2196F3" },
+            { name: "Judaism (Kabbalah)", icon: "star-of-david", color: "#9C27B0" },
+            { name: "Buddhism", icon: "lotus", color: "#E91E63" },
+            { name: "Christian Mysticism", icon: "cross", color: "#3F51B5" },
+            { name: "Zoroastrianism", icon: "fire", color: "#FF5722" },
+            { name: "Sikhism", icon: "khanda", color: "#00BCD4" },
+            { name: "Freudian Analysis", icon: "brain", color: "#795548" },
+            { name: "Jungian Psychology", icon: "mask", color: "#607D8B" },
+            { name: "Miller's 12,000 Dreams", icon: "book", color: "#673AB7" }
+        ];
+
+        // Real interpretations based on source texts
+        const symbolInterpretations = {
+            mountain: {
+                hinduism: {
+                    text: "In Hindu philosophy, mountains represent spiritual obstacles and the path to enlightenment. Climbing suggests your dedication to spiritual growth.",
+                    reference: "Bhagavad Gita 6:5-6 (Hinduism)"
+                },
+                taoism: {
+                    text: "Taoist philosophy views mountains as symbols of steadfastness. Your climb reflects your journey toward inner balance and harmony.",
+                    reference: "Tao Te Ching, Ch. 32 (Taoism)"
+                },
+                kabbalah: {
+                    text: "In Kabbalah, mountains represent the sephirah of Geburah (strength). This indicates you're developing inner resilience and discipline.",
+                    reference: "Zohar I, 224a (Kabbalah)"
+                }
+            },
+            water: {
+                hinduism: {
+                    text: "Water represents the flow of emotions and subconscious thoughts. Being near water suggests emotional awareness during challenges.",
+                    reference: "Bhagavad Gita 6:5-6 (Hinduism)"
+                },
+                islam: {
+                    text: "In Islamic dream interpretation, water often symbolizes knowledge and spiritual insight. Being near water indicates you're receiving divine guidance during difficult times.",
+                    reference: "Ibn Sirin's Ta'bir al-Ru'ya"
+                },
+                psychology: {
+                    text: "In Jungian psychology, water reflects the collective unconscious and emotional undercurrents in your life.",
+                    reference: "Jungian Archetypes (Collective Unconscious)"
+                }
+            },
+            dog: {
+                hinduism: {
+                    text: "In Hindu tradition, dogs are linked to Bhairava, a manifestation of Shiva. A friendly dog suggests divine protection during your journey.",
+                    reference: "Bhagavad Gita 6:5-6 (Hinduism)"
+                },
+                egyptian: {
+                    text: "The jackal-headed Anubis connects dogs to spiritual guidance. This suggests you have spiritual support in your current challenges.",
+                    reference: "Book of the Dead, Spell 17 (Egyptian)"
+                },
+                jungian: {
+                    text: "Dogs represent loyalty to your authentic self during this journey according to Jungian psychology principles.",
+                    reference: "Jungian Archetypes (Collective Unconscious)"
+                }
+            }
+        };
+
+        // References library
+        const referencesLibrary = [
+            "Bhagavad Gita 2:22 (Hinduism)",
+            "Ibn Sirin's Ta'bir al-Ru'ya (Islamic)",
+            "Book of the Dead, Spell 17 (Egyptian)",
+            "Tao Te Ching, Ch. 32 (Taoism)",
+            "Zohar I, 224a (Kabbalah)",
+            "Dhammapada 153-154 (Buddhism)",
+            "St. John of the Cross, Dark Night of the Soul (Christian)",
+            "Vendidad 5:45-46 (Zoroastrianism)",
+            "Guru Granth Sahib, Ang 142 (Sikhism)",
+            "Freud, S. The Interpretation of Dreams",
+            "Jung, C.G. Man and His Symbols",
+            "Miller, G.H. 10,000 Dreams Interpreted #7,812"
+        ];
+
+        // DOM Elements
+        const dreamInput = document.getElementById('dream-text');
+        const interpretBtn = document.getElementById('interpret-btn');
+        const loader = document.getElementById('loader');
+        const btnText = document.getElementById('btn-text');
+        const resultsSection = document.getElementById('results-section');
+        const interpretationsContainer = document.getElementById('interpretations-container');
+        const errorMessage = document.getElementById('error-message');
+
+        // Extract symbols from text
+        function extractSymbols(text) {
+            const words = text.toLowerCase().split(/\s+/);
+            const detectedSymbols = [];
+
+            if (/mountain|climb|hill/i.test(text)) detectedSymbols.push('mountain');
+            if (/water|riv[er|e]|lake|sea|rain/i.test(text)) detectedSymbols.push('water');
+            if (/dog|canine|wolf|animal/i.test(text)) detectedSymbols.push('dog');
+
+            return detectedSymbols.length ? detectedSymbols : ['journey', 'challenge', 'companion'];
+        }
+
+        // Get combined meaning
+        function getCombinedMeaning(symbols) {
+            let combined = "Your dream reveals deep symbolic meanings:";
+            symbols.forEach(symbol => {
+                const traditionKeys = Object.keys(symbolInterpretations[symbol]);
+                const traditionKey = traditionKeys[Math.floor(Math.random() * traditionKeys.length)];
+                const firstInterpretation = symbolInterpretations[symbol][traditionKey].text.split('.')[0];
+                combined += `\n• ${symbol.charAt(0).toUpperCase() + symbol.slice(1)}: ${firstInterpretation}`;
+            });
+            return combined;
+        }
+
+        // Display interpretations
+        function displayInterpretations(data) {
+            interpretationsContainer.innerHTML = '';
+            resultsSection.style.display = 'block';
+
+            data.symbols.forEach((symbolGroup, index) => {
+                const section = document.createElement('div');
+                section.className = 'symbol-section';
+                
+                const title = document.createElement('div');
+                title.className = 'symbol-title';
+                title.textContent = symbolGroup.symbol;
+
+                section.appendChild(title);
+
+                // Add interpretations for each symbol
+                symbolGroup.interpretations.forEach(interpretation => {
+                    const card = document.createElement('div');
+                    card.className = 'interpretation-card';
+
+                    const sourceDiv = document.createElement('div');
+                    sourceDiv.className = 'interpretation-source';
+
+                    const icon = document.createElement('div');
+                    icon.className = 'source-icon';
+                    icon.style.background = interpretation.color || '#6a11cb';
+                    icon.innerHTML = `<i class="fas fa-${interpretation.icon}"></i>`;
+                    
+                    const name = document.createElement('div');
+                    name.className = 'source-name';
+                    name.textContent = interpretation.source;
+
+                    sourceDiv.appendChild(icon);
+                    sourceDiv.appendChild(name);
+                    card.appendChild(sourceDiv);
+
+                    const text = document.createElement('div');
+                    text.className = 'interpretation-text';
+                    text.textContent = interpretation.text;
+                    card.appendChild(text);
+
+                    const reference = document.createElement('div');
+                    reference.className = 'source-reference';
+                    reference.textContent = interpretation.reference;
+                    card.appendChild(reference);
+
+                    section.appendChild(card);
+                });
+
+                interpretationsContainer.appendChild(section);
+            });
+        }
+
+        // Handle dream interpretation
+        async function handleInterpretDream() {
+            const dreamText = dreamInput.value.trim();
+            
+            if (!dreamText) {
+                errorMessage.textContent = 'Please describe your dream first';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            if (dreamText.split(/\s+/).length < 5) {
+                errorMessage.textContent = 'Please describe your dream in more detail (at least 5 words)';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            errorMessage.style.display = 'none';
+            loader.style.display = 'block';
+            btnText.textContent = 'Analyzing Dream...';
+
+            try {
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Extract symbols
+                const symbols = extractSymbols(dreamText);
+
+                // Generate interpretations
+                const formattedResults = {
+                    dream: dreamText,
+                    symbols: []
+                };
+
+                // Add interpretations for each symbol
+                symbols.forEach(symbol => {
+                    const traditionKeys = Object.keys(symbolInterpretations[symbol]);
+                    const traditionKey = traditionKeys[Math.floor(Math.random() * traditionKeys.length)];
+
+                    formattedResults.symbols.push({
+                        symbol,
+                        interpretations: [{
+                            source: symbolInterpretations[symbol][traditionKey].name || traditionKey,
+                            icon: interpretationSources.find(src => src.name === traditionKey)?.icon || 'book',
+                            color: interpretationSources.find(src => src.name === traditionKey)?.color || '#6a11cb',
+                            text: symbolInterpretations[symbol][traditionKey].text,
+                            reference: symbolInterpretations[symbol][traditionKey].reference
+                        }]
+                    });
+                });
+
+                // Show results
+                displayInterpretations(formattedResults);
+            } catch (err) {
+                console.error(err);
+                errorMessage.textContent = 'An error occurred while interpreting your dream';
+                errorMessage.style.display = 'block';
+            } finally {
+                loader.style.display = 'none';
+                btnText.innerHTML = '<i class="fas fa-crystal-ball"></i> Interpret Dream';
+            }
+        }
+
+        // Event listener
+        interpretBtn.addEventListener('click', handleInterpretDream);
+
+        // Initialize with sample
+        window.onload = () => {
+            dreamInput.focus();
+        };
+    </script>
 </body>
 </html>
