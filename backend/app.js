@@ -5,7 +5,7 @@ const cors = require("cors");
 // --- CONFIGURATION ---
 const USE_EXTERNAL_API = true; // set to false to use only local logic
 const EXTERNAL_API_URL = "https://api.deepseek.com/v1/dream";
-const EXTERNAL_API_KEY = process.env.DEEPSEEK_API_KEY; // Set in your environment
+const EXTERNAL_API_KEY = process.env.sk-b7c871d589dd43528cf2975c52bc1477; // Set in your environment
 
 const app = express();
 app.use(cors());
