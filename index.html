@@ -324,4 +324,162 @@
     // DOM Elements
     const dreamInput = document.getElementById("dream-text");
     const interpretBtn = document.getElementById("interpret-btn");
-    const interpretationsContainer =
+    const interpretationsContainer = document.getElementById("interpretations-container");
+    const resultsSection = document.getElementById("results-section");
+    const errorMessage = document.getElementById("error-message");
+
+    // Extract symbols from dream text
+    function extractSymbols(text) {
+      const words = text.toLowerCase().split(/\s+/);
+      const symbols = [];
+
+      if (/mountain|climb|hill/i.test(text)) symbols.push("mountain");
+      if (/water|riv[er|e]|lake|sea|rain/i.test(text)) symbols.push("water");
+      if (/dog|canine|wolf|animal/i.test(text)) symbols.push("dog");
+
+      return symbols.length ? symbols : ["journey", "challenge", "companion"];
+    }
+
+    // Get symbol interpretation
+    function getSymbolInterpretation(symbol, source) {
+      const interpretations = interpretationsLibrary[symbol] || [
+        `The ${symbol} represents an important symbol in your personal journey`,
+        `This ${symbol} suggests a significant aspect of your subconscious mind`
+      ];
+      return `${interpretations[Math.floor(Math.random() * interpretations.length)]} (${source} perspective).`;
+    }
+
+    // Format interpretations
+    function formatInterpretations(dreamText, symbols) {
+      const result = [];
+      const combinedMeaning = {
+        symbol: "Overall Meaning",
+        interpretations: [
+          {
+            source: "DreamBase AI Synthesis",
+            text: `Your dream about ${symbols.join(", ")} suggests ${getRandomMeaning()}. This reflects ${getRandomReflection()}.`,
+            reference: "DreamBase AI v3.1"
+          }
+        ]
+      };
+      result.push(combinedMeaning);
+
+      symbols.forEach((symbol) => {
+        result.push({
+          symbol,
+          interpretations: []
+        });
+
+        const traditionIndices = new Set();
+        while (traditionIndices.size < 2 && traditionIndices.size < interpretationSources.length) {
+          traditionIndices.add(Math.floor(Math.random() * interpretationSources.length));
+        }
+
+        Array.from(traditionIndices).forEach((index) => {
+          result[result.length - 1].interpretations.push({
+            source: interpretationSources[index].name,
+            icon: interpretationSources[index].icon,
+            color: interpretationSources[index].color,
+            text: getSymbolInterpretation(symbol, interpretationSources[index].name),
+            reference: referencesLibrary[Math.floor(Math.random() * referencesLibrary.length)]
+          });
+        });
+      });
+
+      return result;
+    }
+
+    // Generate random meaning
+    function getRandomMeaning() {
+      const meanings = [
+        "a period of personal growth and transformation",
+        "unresolved emotions seeking your attention",
+        "hidden aspects of your personality coming to light",
+        "challenges that will lead to important lessons",
+        "a transition phase in your relationships"
+      ];
+      return meanings[Math.floor(Math.random() * meanings.length)];
+    }
+
+    // Generate random reflection
+    function getRandomReflection() {
+      const reflections = [
+        "your subconscious processing daily experiences",
+        "deep-seated desires seeking expression",
+        "unresolved conflicts from your past",
+        "your mind preparing for upcoming challenges",
+        "creative energies manifesting in symbolic form"
+      ];
+      return reflections[Math.floor(Math.random() * reflections.length)];
+    }
+
+    // Display interpretations
+    function displayInterpretations(data) {
+      interpretationsContainer.innerHTML = "";
+
+      data.forEach((item) => {
+        item.interpretations.forEach((interpretation) => {
+          const card = document.createElement("div");
+          card.className = "symbol-card";
+
+          const title = document.createElement("div");
+          title.className = "symbol-name";
+          title.textContent = interpretation.source;
+
+          const text = document.createElement("div");
+          text.className = "interpretation";
+          text.textContent = interpretation.text;
+
+          const source = document.createElement("div");
+          source.className = "source";
+          source.textContent = interpretation.reference;
+
+          card.appendChild(title);
+          card.appendChild(text);
+          card.appendChild(source);
+          interpretationsContainer.appendChild(card);
+        });
+      });
+
+      resultsSection.style.display = "block";
+    }
+
+    // Handle dream interpretation
+    function handleInterpretDream() {
+      const dreamText = dreamInput.value.trim();
+
+      if (!dreamText) {
+        errorMessage.style.display = "block";
+        errorMessage.textContent = "Please describe your dream first";
+        return;
+      }
+
+      if (dreamText.split(/\s+/).length < 5) {
+        errorMessage.style.display = "block";
+        errorMessage.textContent = "Please describe your dream in more detail (at least 5 words)";
+        return;
+      }
+
+      errorMessage.style.display = "none";
+      interpretBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Interpreting Dream...`;
+      interpretBtn.disabled = true;
+
+      setTimeout(() => {
+        const symbols = extractSymbols(dreamText);
+        const interpretationData = formatInterpretations(dreamText, symbols);
+        displayInterpretations(interpretationData);
+        interpretBtn.innerHTML = `<i class="fas fa-crystal-ball"></i> Interpret Dream`;
+        interpretBtn.disabled = false;
+      }, 2000);
+    }
+
+    // Event listener
+    interpretBtn.addEventListener("click", handleInterpretDream);
+
+    // Initialize with sample
+    window.onload = () => {
+      dreamInput.focus();
+    };
+  </script>
+</body>
+</html>
