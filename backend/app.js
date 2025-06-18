@@ -1,132 +1,102 @@
-const express = require("express");
-const fetch = require("node-fetch"); // v2 or compatible fetch polyfill
-const cors = require("cors");
-
-// --- CONFIGURATION ---
-const USE_EXTERNAL_API = true; // set to false to use only local logic
-const EXTERNAL_API_URL = "https://api.deepseek.com/v1/dream";
-const EXTERNAL_API_KEY = process.env.; // Set in your environment
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-// --- Local AI/Symbolic interpretation logic ---
-const interpretationSources = [ /* ...same array as your frontend... */ ];
-const symbolInterpretations = { /* ...same object as your frontend... */ };
-
-// Symbol extraction and formatting logic (same as above)
-function extractSymbols(text) {
-  const words = text.toLowerCase().split(/\s+/);
-  const detected = [];
-  if (/mountain|climb|hill/i.test(text)) detected.push("mountain");
-  if (/water|riv[er|e]|lake|sea|rain/i.test(text)) detected.push("water");
-  if (/dog|canine|wolf|animal/i.test(text)) detected.push("dog");
-  return detected.length ? detected : ["journey", "challenge", "companion"];
-}
-
-function getRandomMeaning(symbols) {
-  const meanings = [
-    "This dream suggests a period of personal growth and transformation.",
-    "Your dream reveals emotional themes that need attention.",
-    "You're facing symbolic challenges related to your relationships.",
-    "Hidden aspects of your personality are emerging through this dream."
-  ];
-  return meanings[Math.floor(Math.random() * meanings.length)];
-}
-
-function formatInterpretations(dreamText, symbols) {
-  const result = {
-    overview: {
-      text: `Your dream about ${symbols.join(', ')} suggests ${getRandomMeaning(symbols)}. This reflects your current life situation.`,
-      reference: "DreamBase AI v3.1"
-    },
-    symbols: []
-  };
-
-  symbols.forEach(symbol => {
-    const traditionKeys = Object.keys(symbolInterpretations[symbol] || {});
-    if (traditionKeys.length === 0) {
-      result.symbols.push({
-        symbol: symbol.charAt(0).toUpperCase() + symbol.slice(1),
-        interpretations: [{
-          source: "General",
-          icon: "book",
-          color: "#6a11cb",
-          text: `The ${symbol} represents an important theme in your personal journey.`,
-          reference: "DreamBase AI v3.1"
-        }]
-      });
-      return;
-    }
-    const traditionKey = traditionKeys[Math.floor(Math.random() * traditionKeys.length)];
-    const traditionData = symbolInterpretations[symbol][traditionKey];
-    const source = interpretationSources.find(src => src.key === traditionKey) || {
-      icon: "book",
-      color: "#6a11cb",
-      name: traditionKey.charAt(0).toUpperCase() + traditionKey.slice(1)
-    };
-    result.symbols.push({
-      symbol: symbol.charAt(0).toUpperCase() + symbol.slice(1),
-      interpretations: [{
-        source: source.name,
-        icon: source.icon,
-        color: source.color,
-        text: traditionData.text,
-        reference: traditionData.reference
-      }]
-    });
-  });
-
-  return result;
-}
-
-// --- Main API endpoint ---
-app.post("/api/interpret", async (req, res) => {
-  const dreamText = (req.body.dream || "").trim();
-
-  if (!dreamText || dreamText.split(/\s+/).length < 5) {
-    return res.status(400).json({ error: "Please describe your dream in more detail (at least 5 words)" });
-  }
-
-  // If configured, try external API
-  if (USE_EXTERNAL_API && EXTERNAL_API_KEY) {
-    try {
-      const apiResponse = await fetch(EXTERNAL_API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${EXTERNAL_API_KEY}`
-        },
-        body: JSON.stringify({ dream: dreamText })
-      });
-
-      if (apiResponse.ok) {
-        const result = await apiResponse.json();
-        // If result is a flat array of interpretations, return as-is
-        if (Array.isArray(result.interpretations)) {
-          return res.json({ interpretations: result.interpretations });
+// Cloudflare Worker: Dream Interpreter API
+export default {
+    async fetch(request, env, ctx) {
+        if (request.method !== "POST") {
+            return new Response(JSON.stringify({
+                error: "Only POST requests allowed"
+            }), {
+                status: 405,
+                headers: { "Content-Type": "application/json" }
+            });
         }
-        // Otherwise, handle custom structure
-        return res.json(result);
-      }
-    } catch (err) {
-      // Fall through to local logic
-      console.warn("External API call failed, falling back to local logic.", err);
+
+        let data;
+        try {
+            data = await request.json();
+        } catch (e) {
+            return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
+                status: 400,
+                headers: { "Content-Type": "application/json" }
+            });
+        }
+
+        const { dream } = data;
+        if (!dream || typeof dream !== "string" || dream.trim().length < 5) {
+            return new Response(JSON.stringify({ error: "Dream text must be at least 5 characters" }), {
+                status: 400,
+                headers: { "Content-Type": "application/json" }
+            });
+        }
+
+        // Basic symbol extraction (replace with more robust logic or call backend API)
+        const lowerDream = dream.toLowerCase();
+        const symbols = [];
+        if (/mountain|climb|hill/.test(lowerDream)) symbols.push('mountain');
+        if (/water|river|sea|lake|rain/.test(lowerDream)) symbols.push('water');
+        if (/dog|canine|wolf|animal/.test(lowerDream)) symbols.push('dog');
+        if (symbols.length === 0) symbols.push('journey', 'challenge', 'companion');
+
+        // Example: hardcoded interpretations (replace with Supabase or backend API fetch)
+        const lookup = {
+            mountain: {
+                symbol: "mountain",
+                source: "Hinduism",
+                icon: "book",
+                color: "#FF6B6B",
+                interpretation: "In Hindu philosophy, mountains represent spiritual obstacles and the path to enlightenment.",
+                reference: "Bhagavad Gita 6:5-6 (Hinduism)"
+            },
+            water: {
+                symbol: "water",
+                source: "Islamic Tradition",
+                icon: "moon",
+                color: "#4CAF50",
+                interpretation: "Water symbolizes knowledge and spiritual insight during difficult times.",
+                reference: "Ibn Sirin's Ta'bir al-Ru'ya"
+            },
+            dog: {
+                symbol: "dog",
+                source: "Jungian Psychology",
+                icon: "mask",
+                color: "#607D8B",
+                interpretation: "Dogs represent loyalty to your authentic self according to Jungian psychology principles.",
+                reference: "Jungian Archetypes (Collective Unconscious)"
+            },
+            journey: {
+                symbol: "journey",
+                source: "General Symbolism",
+                icon: "road",
+                color: "#6a11cb",
+                interpretation: "A journey in dreams often reflects your life's path and personal growth.",
+                reference: "Modern Dream Studies"
+            },
+            challenge: {
+                symbol: "challenge",
+                source: "General Symbolism",
+                icon: "bolt",
+                color: "#2575fc",
+                interpretation: "Challenges in dreams may represent obstacles you are currently facing.",
+                reference: "Modern Dream Studies"
+            },
+            companion: {
+                symbol: "companion",
+                source: "General Symbolism",
+                icon: "user-friends",
+                color: "#ff6b6b",
+                interpretation: "A companion in dreams reflects support systems or relationships in your waking life.",
+                reference: "Modern Dream Studies"
+            }
+        };
+
+        const interpretations = symbols
+            .filter((sym) => lookup[sym])
+            .map((sym) => lookup[sym]);
+
+        return new Response(JSON.stringify(interpretations), {
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*"
+            }
+        });
     }
-  }
-
-  // Local AI (symbolic) logic fallback
-  const symbols = extractSymbols(dreamText);
-  const interpretationData = formatInterpretations(dreamText, symbols);
-  res.json(interpretationData);
-});
-
-// --- Serve static files (optional) ---
-// app.use(express.static("public")); // If you want to serve your front-end from the same server
-
-// --- Start server ---
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Dream interpreter backend running on port ${PORT}`);
-});
+};
