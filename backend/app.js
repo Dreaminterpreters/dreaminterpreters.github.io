@@ -1,102 +1,267 @@
-// Cloudflare Worker: Dream Interpreter API
-export default {
-    async fetch(request, env, ctx) {
-        if (request.method !== "POST") {
-            return new Response(JSON.stringify({
-                error: "Only POST requests allowed"
-            }), {
-                status: 405,
-                headers: { "Content-Type": "application/json" }
-            });
-        }
+// dream-app.js — Frontend logic for Dream Interpreter app (using Vercel backend API)
 
-        let data;
-        try {
-            data = await request.json();
-        } catch (e) {
-            return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
-                status: 400,
-                headers: { "Content-Type": "application/json" }
-            });
-        }
+// --- CONFIGURATION ---
+const API_BASE = ""; // If frontend is served from same domain as backend, leave blank. Else, e.g. "https://your-project.vercel.app"
+const DREAM_INTERPRET_ENDPOINT = `${API_BASE}/api/dreams/interpret`;
+const REGISTER_ENDPOINT = `${API_BASE}/api/auth/register`;
+const LOGIN_ENDPOINT = `${API_BASE}/api/auth/login`;
+const DREAM_HISTORY_ENDPOINT = `${API_BASE}/api/dreams/history`;
 
-        const { dream } = data;
-        if (!dream || typeof dream !== "string" || dream.trim().length < 5) {
-            return new Response(JSON.stringify({ error: "Dream text must be at least 5 characters" }), {
-                status: 400,
-                headers: { "Content-Type": "application/json" }
-            });
-        }
+// --- DOM ELEMENTS ---
+const dreamInput = document.getElementById('dream-text');
+const interpretBtn = document.getElementById('interpret-btn');
+const loader = document.getElementById('loader');
+const btnText = document.getElementById('btn-text');
+const resultsSection = document.getElementById('results-section');
+const interpretationsContainer = document.getElementById('interpretations-container');
+const errorMessage = document.getElementById('error-message');
 
-        // Basic symbol extraction (replace with more robust logic or call backend API)
-        const lowerDream = dream.toLowerCase();
-        const symbols = [];
-        if (/mountain|climb|hill/.test(lowerDream)) symbols.push('mountain');
-        if (/water|river|sea|lake|rain/.test(lowerDream)) symbols.push('water');
-        if (/dog|canine|wolf|animal/.test(lowerDream)) symbols.push('dog');
-        if (symbols.length === 0) symbols.push('journey', 'challenge', 'companion');
+// For auth modals (implement your own modals or use prompt for simplicity)
+const loginBtn = document.getElementById('login-btn');
+const registerBtn = document.getElementById('register-btn');
+const logoutBtn = document.getElementById('logout-btn');
+const userStatus = document.getElementById('user-status');
 
-        // Example: hardcoded interpretations (replace with Supabase or backend API fetch)
-        const lookup = {
-            mountain: {
-                symbol: "mountain",
-                source: "Hinduism",
-                icon: "book",
-                color: "#FF6B6B",
-                interpretation: "In Hindu philosophy, mountains represent spiritual obstacles and the path to enlightenment.",
-                reference: "Bhagavad Gita 6:5-6 (Hinduism)"
-            },
-            water: {
-                symbol: "water",
-                source: "Islamic Tradition",
-                icon: "moon",
-                color: "#4CAF50",
-                interpretation: "Water symbolizes knowledge and spiritual insight during difficult times.",
-                reference: "Ibn Sirin's Ta'bir al-Ru'ya"
-            },
-            dog: {
-                symbol: "dog",
-                source: "Jungian Psychology",
-                icon: "mask",
-                color: "#607D8B",
-                interpretation: "Dogs represent loyalty to your authentic self according to Jungian psychology principles.",
-                reference: "Jungian Archetypes (Collective Unconscious)"
-            },
-            journey: {
-                symbol: "journey",
-                source: "General Symbolism",
-                icon: "road",
-                color: "#6a11cb",
-                interpretation: "A journey in dreams often reflects your life's path and personal growth.",
-                reference: "Modern Dream Studies"
-            },
-            challenge: {
-                symbol: "challenge",
-                source: "General Symbolism",
-                icon: "bolt",
-                color: "#2575fc",
-                interpretation: "Challenges in dreams may represent obstacles you are currently facing.",
-                reference: "Modern Dream Studies"
-            },
-            companion: {
-                symbol: "companion",
-                source: "General Symbolism",
-                icon: "user-friends",
-                color: "#ff6b6b",
-                interpretation: "A companion in dreams reflects support systems or relationships in your waking life.",
-                reference: "Modern Dream Studies"
-            }
-        };
+// --- Auth Utilities ---
+function saveToken(token) {
+    localStorage.setItem('dream_token', token);
+}
+function getToken() {
+    return localStorage.getItem('dream_token');
+}
+function clearToken() {
+    localStorage.removeItem('dream_token');
+}
+function isLoggedIn() {
+    return !!getToken();
+}
 
-        const interpretations = symbols
-            .filter((sym) => lookup[sym])
-            .map((sym) => lookup[sym]);
+// --- UI Helper Functions ---
+function showError(msg) {
+    errorMessage.textContent = msg;
+    errorMessage.style.display = 'block';
+}
+function clearError() {
+    errorMessage.style.display = 'none';
+}
+function showLoader() {
+    loader.style.display = 'block';
+    btnText.textContent = "Analyzing Dream...";
+}
+function hideLoader() {
+    loader.style.display = 'none';
+    btnText.innerHTML = '<i class="fas fa-crystal-ball"></i> Interpret Dream';
+}
+function showResultsSection() {
+    resultsSection.style.display = 'block';
+}
+function clearInterpretations() {
+    interpretationsContainer.innerHTML = '';
+}
 
-        return new Response(JSON.stringify(interpretations), {
+// --- Main Dream Interpretation Handler ---
+async function handleInterpretDream() {
+    const dreamText = dreamInput.value.trim();
+
+    if (!dreamText) {
+        showError('Please describe your dream first');
+        return;
+    }
+    if (dreamText.split(/\s+/).length < 5) {
+        showError('Please describe your dream in more detail (at least 5 words)');
+        return;
+    }
+    clearError();
+    showLoader();
+
+    try {
+        const response = await fetch(DREAM_INTERPRET_ENDPOINT, {
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*"
+                ...(isLoggedIn() ? { "Authorization": `Bearer ${getToken()}` } : {})
+            },
+            body: JSON.stringify({ dream: dreamText })
+        });
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error || "Failed to interpret dream");
+        }
+
+        const apiResult = await response.json();
+        clearInterpretations();
+        displayInterpretations(formatInterpretations(apiResult));
+    } catch (err) {
+        showError(err.message || 'An error occurred while interpreting your dream');
+    } finally {
+        hideLoader();
+    }
+}
+
+// --- Format and Display Interpretations ---
+function formatInterpretations(data) {
+    // Assumes backend returns array of { symbol, interpretations: [{ source, icon, color, text, reference }] }
+    // If backend returns flat array, adapt as needed
+    if (Array.isArray(data) && data.length && data[0].interpretations) {
+        return data;
+    }
+    // fallback: wrap flat list
+    return data.map(item => ({
+        symbol: item.symbol,
+        interpretations: [{
+            source: item.source,
+            icon: item.icon,
+            color: item.color,
+            text: item.interpretation,
+            reference: item.reference
+        }]
+    }));
+}
+
+function displayInterpretations(data) {
+    clearInterpretations();
+    showResultsSection();
+
+    if (!data.length) {
+        interpretationsContainer.innerHTML = '<div class="no-results fade-in">No interpretations found for your dream.</div>';
+        return;
+    }
+
+    data.forEach(symbolGroup => {
+        symbolGroup.interpretations.forEach(interpretation => {
+            const card = document.createElement('div');
+            card.className = 'symbol-card fade-in';
+
+            const sourceDiv = document.createElement('div');
+            sourceDiv.className = 'interpretation-source';
+
+            const icon = document.createElement('div');
+            icon.className = 'source-icon';
+            icon.style.background = interpretation.color || '#6a11cb';
+            icon.innerHTML = `<i class="fas fa-${interpretation.icon}"></i>`;
+
+            const name = document.createElement('div');
+            name.className = 'source-name';
+            name.textContent = interpretation.source;
+
+            sourceDiv.appendChild(icon);
+            sourceDiv.appendChild(name);
+            card.appendChild(sourceDiv);
+
+            const text = document.createElement('div');
+            text.className = 'interpretation-text';
+            text.textContent = interpretation.text;
+            card.appendChild(text);
+
+            if (interpretation.reference) {
+                const reference = document.createElement('div');
+                reference.className = 'source-reference';
+                reference.textContent = interpretation.reference;
+                card.appendChild(reference);
+            }
+
+            interpretationsContainer.appendChild(card);
+        });
+    });
+
+    resultsSection.scrollIntoView({ behavior: 'smooth' });
+}
+
+// --- Dream History Handler ---
+async function fetchDreamHistory() {
+    if (!isLoggedIn()) return;
+
+    try {
+        const response = await fetch(DREAM_HISTORY_ENDPOINT, {
+            headers: {
+                "Authorization": `Bearer ${getToken()}`
             }
         });
+        if (!response.ok) {
+            throw new Error("Could not fetch dream history");
+        }
+        const { dreams } = await response.json();
+        // You can add code to display dream history as you wish
+        // e.g., renderDreamHistory(dreams);
+    } catch (err) {
+        // Optionally show a message to the user
+        // showError("Problem loading dream history");
+    }
+}
+
+// --- Auth: Register, Login, Logout ---
+async function handleRegister(email, password, name) {
+    try {
+        const res = await fetch(REGISTER_ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password, name })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Registration failed");
+        saveToken(data.token);
+        updateUserStatus();
+        // Optionally show success message
+    } catch (err) {
+        showError(err.message);
+    }
+}
+
+async function handleLogin(email, password) {
+    try {
+        const res = await fetch(LOGIN_ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Login failed");
+        saveToken(data.token);
+        updateUserStatus();
+    } catch (err) {
+        showError(err.message);
+    }
+}
+
+function handleLogout() {
+    clearToken();
+    updateUserStatus();
+}
+
+// --- UI Auth Integration ---
+function updateUserStatus() {
+    if (userStatus) {
+        userStatus.style.display = isLoggedIn() ? "inline" : "none";
+        userStatus.textContent = isLoggedIn() ? "Logged in" : "Not logged in";
+    }
+    if (loginBtn) loginBtn.style.display = isLoggedIn() ? "none" : "inline";
+    if (registerBtn) registerBtn.style.display = isLoggedIn() ? "none" : "inline";
+    if (logoutBtn) logoutBtn.style.display = isLoggedIn() ? "inline" : "none";
+}
+
+// --- Event Listeners ---
+interpretBtn.addEventListener('click', handleInterpretDream);
+
+if (loginBtn) loginBtn.addEventListener('click', () => {
+    // Replace with your modal or form logic
+    const email = prompt("Email:");
+    const password = prompt("Password:");
+    handleLogin(email, password);
+});
+if (registerBtn) registerBtn.addEventListener('click', () => {
+    const name = prompt("Name:");
+    const email = prompt("Email:");
+    const password = prompt("Password:");
+    handleRegister(email, password, name);
+});
+if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
+
+// --- Initialization ---
+window.onload = () => {
+    dreamInput.focus();
+    updateUserStatus();
+    if (isLoggedIn()) {
+        fetchDreamHistory();
     }
 };
